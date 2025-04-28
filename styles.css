@@ -6,7 +6,7 @@ body {
   font-family: Arial, sans-serif;
   text-align: center;
   padding: 2rem;
-  background: var(--background-gradient); /* Use random tie-dye gradient! */
+  background: var(--background-gradient); /* 🎨 Tie-dye background */
   background-size: cover;
   background-attachment: fixed;
   min-height: 100vh;
@@ -16,7 +16,7 @@ body {
 .container {
   max-width: 400px;
   margin: auto;
-  background: rgba(255, 255, 255, 0.85); /* semi-transparent white card */
+  background: rgba(255, 255, 255, 0.85); /* semi-transparent white panel */
   padding: 2rem;
   border-radius: 15px;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
@@ -98,4 +98,20 @@ button:hover {
 #downloadCSV:hover {
   background-color: #45a049;
   transform: scale(1.05);
+}
+
+/* Toast Notification Style (e.g. for "Saved!" messages) */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  opacity: 0.95;
+  z-index: 9999;
 }
