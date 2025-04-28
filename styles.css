@@ -1,22 +1,32 @@
+:root {
+  --background-gradient: #ffffff; /* fallback color if JS fails */
+}
+
 body {
   font-family: Arial, sans-serif;
-  background: #f0f0f0;
   text-align: center;
   padding: 2rem;
+  background: var(--background-gradient);
+  background-size: cover;
+  background-attachment: fixed;
+  min-height: 100vh;
+  transition: background 1s ease-in-out;
 }
 
 .container {
   max-width: 400px;
   margin: auto;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.85); /* Semi-transparent white panel */
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
 }
 
 #timer {
   font-size: 3rem;
   margin: 1rem 0;
+  font-weight: bold;
+  color: #222;
 }
 
 button {
@@ -24,14 +34,68 @@ button {
   margin: 10px 5px;
   font-size: 1rem;
   cursor: pointer;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #555;
+  transform: scale(1.05);
 }
 
 .lap-controls {
   margin-top: 2rem;
 }
 
+#lapCount {
+  font-size: 1.5rem;
+  color: #333;
+}
+
 #summary {
   margin-top: 2rem;
   font-size: 1rem;
   color: #333;
+}
+
+/* Style for Results Table */
+#resultsTable {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+}
+
+#resultsTable th,
+#resultsTable td {
+  border: 1px solid #999;
+  padding: 8px 12px;
+}
+
+#resultsTable th {
+  background-color: #333;
+  color: white;
+}
+
+#resultsTable td {
+  background-color: #fafafa;
+}
+
+/* Download CSV Button Style */
+#downloadCSV {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#downloadCSV:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
 }
