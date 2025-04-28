@@ -1,8 +1,9 @@
 let timer;
-const raceDuration = 33 * 60 + 20; // seconds
+const raceDuration = 33 * 60 + 20;
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
+let isAdmin = false; // New flag!
 
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
@@ -12,6 +13,19 @@ const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
 
+// --- Admin Protection --- //
+function authenticateAdmin() {
+  const answer = prompt("Admin access? Enter code:");
+  if (answer === "letmein") {
+    isAdmin = true;
+    startButton.style.display = "inline-block"; // Show button
+  } else {
+    isAdmin = false;
+    startButton.style.display = "none"; // Hide button
+  }
+}
+
+// --- Timer Functions --- //
 function updateTimerDisplay(timeRemaining) {
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
@@ -31,13 +45,11 @@ function updateRaceClock() {
 }
 
 function startRace() {
-  if (!localStorage.getItem('startTimestamp')) {
+  if (!localStorage.getItem('startTimestamp') && isAdmin) {
     startTimestamp = Date.now();
     localStorage.setItem('startTimestamp', startTimestamp);
-  } else {
-    startTimestamp = parseInt(localStorage.getItem('startTimestamp'), 10);
+    timer = setInterval(updateRaceClock, 1000);
   }
-  timer = setInterval(updateRaceClock, 1000);
 }
 
 function recordLap() {
@@ -52,9 +64,8 @@ function recordLap() {
 }
 
 function updateLapLog() {
-  // Only update if race is still ongoing
   if (timer) {
-    summaryDisplay.innerHTML = laps.map(lapObj => 
+    summaryDisplay.innerHTML = laps.map(lapObj =>
       'Lap ' + lapObj.lap + ' - ' + lapObj.time
     ).join('<br>');
   }
@@ -103,13 +114,13 @@ function launchConfetti() {
   })();
 }
 
+// --- Button Listeners --- //
 startButton.addEventListener('click', startRace);
 addLapButton.addEventListener('click', function() {
   lapCount++;
   lapDisplay.textContent = lapCount;
   recordLap();
 });
-
 subtractLapButton.addEventListener('click', function() {
   if (lapCount > 0) {
     lapCount--;
@@ -119,7 +130,10 @@ subtractLapButton.addEventListener('click', function() {
   }
 });
 
+// --- On Load --- //
 window.onload = function() {
+  authenticateAdmin();
+  
   if (localStorage.getItem('startTimestamp')) {
     startTimestamp = parseInt(localStorage.getItem('startTimestamp'), 10);
     timer = setInterval(updateRaceClock, 1000);
