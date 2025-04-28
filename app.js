@@ -17,7 +17,7 @@ const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
 
-// --- Fun Random Tie-Dye Background --- //
+// --- Tie-Dye Background --- //
 function setRandomBackground() {
   const colors = [
     '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF',
@@ -45,13 +45,14 @@ function authenticateAdmin() {
   }
 }
 
-// --- Timer Functions --- //
+// --- Timer Display --- //
 function updateTimerDisplay(timeRemaining) {
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
   timerDisplay.textContent = minutes + ':' + seconds.toString().padStart(2, '0');
 }
 
+// --- Timer Countdown Logic --- //
 function updateRaceClock() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -70,12 +71,16 @@ function startRace() {
     const now = Date.now();
     startTimestamp = now;
     localStorage.setItem('startTimestamp', startTimestamp);
-    clearInterval(timer);
-    timer = setInterval(updateRaceClock, 1000);
+
+    if (timer) {
+      clearInterval(timer);
+    }
+    updateRaceClock(); // <<< immediate update
+    timer = setInterval(updateRaceClock, 1000); // <<< start ticking
   }
 }
 
-// --- Lap Recording Functions --- //
+// --- Lap Recording --- //
 function recordLap() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -100,8 +105,7 @@ function finishRace() {
   generateResultsTable();
   launchConfetti();
   airhorn.play();
-
-  setTimeout(askExtraDistance, 1500); // After confetti
+  setTimeout(askExtraDistance, 1500);
 }
 
 // --- Ask Lane Type and Extra Distance --- //
@@ -138,7 +142,7 @@ ${avgLapFormatted} per lap
   summaryDisplay.innerHTML += `<br><br><strong>${finalStats.replace(/\n/g, '<br>')}</strong>`;
 }
 
-// --- Results Table and Download CSV --- //
+// --- Generate Results Table --- //
 function generateResultsTable() {
   let html = `<h2>🏁 Race Results for ${runnerName.replace(/_/g, ' ')}</h2>`;
   html += '<table id="resultsTable" style="margin:auto; border-collapse: collapse;">';
@@ -155,6 +159,7 @@ function generateResultsTable() {
   document.getElementById('downloadCSV').addEventListener('click', exportTableToCSV);
 }
 
+// --- Export CSV --- //
 function exportTableToCSV() {
   const table = document.getElementById('resultsTable');
   let csv = [];
@@ -197,7 +202,7 @@ function exportTableToCSV() {
   document.body.removeChild(downloadLink);
 }
 
-// --- Confetti Celebration --- //
+// --- Confetti --- //
 function launchConfetti() {
   const duration = 3 * 1000;
   const end = Date.now() + duration;
@@ -222,7 +227,7 @@ function launchConfetti() {
   })();
 }
 
-// --- Toast Notification --- //
+// --- Toast Message --- //
 function showToast(message) {
   const toast = document.createElement('div');
   toast.textContent = message;
@@ -234,7 +239,7 @@ function showToast(message) {
   }, 1200);
 }
 
-// --- Master Reset --- //
+// --- Master Reset Race --- //
 function resetRace() {
   if (laps.length > 0) {
     const saveFirst = confirm("Save the current race before resetting?");
@@ -285,7 +290,7 @@ window.onload = function() {
 
   lapDisplay.textContent = lapCount;
 
-  // --- New: Watch LocalStorage Every Second for StartTimestamp Sync --- //
+  // Watch LocalStorage every second
   setInterval(() => {
     const liveTimestamp = localStorage.getItem('startTimestamp');
     if (liveTimestamp && !startTimestamp) {
