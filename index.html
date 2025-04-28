@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LP Run Lap Counter</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
@@ -21,10 +21,14 @@
       <button id="subtractLap">-1 Lap</button>
     </div>
 
+    <button id="resetButton" style="margin-top: 20px;">Master Reset</button>
+
     <div id="summary"></div>
 
+    <!-- Preload airhorn sound for race finish -->
     <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
+  </div>
 
-    <script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
