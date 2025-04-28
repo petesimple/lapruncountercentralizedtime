@@ -1,40 +1,39 @@
 let timer;
 const raceDuration = 33 * 60 + 20; // total race time in seconds
-//const raceDuration = 20; // total race time in seconds TEST TIMER
+// const raceDuration = 20; // Uncomment for quick test
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
-let isAdmin = false; // Admin control flag
+let isAdmin = false;
+let runnerName = 'Runner'; // New!
 
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
 const addLapButton = document.getElementById('addLap');
 const subtractLapButton = document.getElementById('subtractLap');
+const resetButton = document.getElementById('resetButton');
 const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
 
-// --- Fun Random Tie-Dye Background --- //
+// --- Random Tie-Dye Background --- //
 function setRandomBackground() {
   const colors = [
     '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF',
     '#FF6FF2', '#FFA45B', '#42E2B8', '#C08497',
     '#F2BE22', '#7BDFF2', '#B28DFF'
   ];
-  
   const pickColor = () => colors[Math.floor(Math.random() * colors.length)];
-  
   const gradient = `radial-gradient(circle at ${Math.floor(Math.random() * 100)}% ${Math.floor(Math.random() * 100)}%, 
     ${pickColor()}, ${pickColor()}, ${pickColor()})`;
-    
   document.body.style.setProperty('--background-gradient', gradient);
 }
 
-// --- Admin Authentication via URL --- //
+// --- Admin Authentication --- //
 function authenticateAdmin() {
   const urlParams = new URLSearchParams(window.location.search);
   const adminCode = urlParams.get('admin');
-  if (adminCode === 'letmein') { // << You can change 'letmein' to any secret you want
+  if (adminCode === 'letmein') {
     isAdmin = true;
     startButton.style.display = "inline-block";
   } else {
@@ -70,7 +69,7 @@ function startRace() {
   }
 }
 
-// --- Lap Recording Functions --- //
+// --- Lap Recording --- //
 function recordLap() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -99,7 +98,7 @@ function finishRace() {
 
 // --- Results Table and Download CSV --- //
 function generateResultsTable() {
-  let html = '<h2>🏁 Race Results</h2>';
+  let html = `<h2>🏁 Race Results for ${runnerName.replace(/_/g, ' ')}</h2>`;
   html += '<table id="resultsTable" style="margin:auto; border-collapse: collapse;">';
   html += '<tr><th style="border:1px solid black; padding:5px;">Lap</th><th style="border:1px solid black; padding:5px;">Time Remaining</th></tr>';
 
@@ -111,7 +110,6 @@ function generateResultsTable() {
   html += '<br><button id="downloadCSV" style="margin-top:10px;">Download CSV</button>';
   summaryDisplay.innerHTML = html;
 
-  // Add event listener for download button
   document.getElementById('downloadCSV').addEventListener('click', exportTableToCSV);
 }
 
@@ -133,8 +131,18 @@ function exportTableToCSV() {
   }
 
   const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+
+  const now = new Date();
+  const dateStr = now.getFullYear() + '-' +
+                  String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                  String(now.getDate()).padStart(2, '0') + '_' +
+                  String(now.getHours()).padStart(2, '0') + '-' +
+                  String(now.getMinutes()).padStart(2, '0') + '-' +
+                  String(now.getSeconds()).padStart(2, '0');
+  const filename = `lprun_${runnerName}_${dateStr}.csv`;
+
   const downloadLink = document.createElement('a');
-  downloadLink.download = 'lap_results.csv';
+  downloadLink.download = filename;
   downloadLink.href = window.URL.createObjectURL(csvFile);
   downloadLink.style.display = 'none';
   document.body.appendChild(downloadLink);
@@ -167,15 +175,71 @@ function launchConfetti() {
   })();
 }
 
+// --- Toast Notification --- //
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '20px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.background = '#4CAF50';
+  toast.style.color = 'white';
+  toast.style.padding = '10px 20px';
+  toast.style.borderRadius = '8px';
+  toast.style.fontSize = '1rem';
+  toast.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+  toast.style.opacity = '0.95';
+  toast.style.zIndex = '9999';
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 1200);
+}
+
+// --- Master Reset (Save Option) --- //
+function resetRace() {
+  if (laps.length > 0) {
+    const saveFirst = confirm("Do you want to save the current race results before resetting?");
+    if (saveFirst) {
+      exportTableToCSV();
+      showToast("✅ Results Saved!");
+
+      setTimeout(() => {
+        actuallyResetRace();
+      }, 1500);
+      return;
+    }
+  }
+  actuallyResetRace();
+}
+
+function actuallyResetRace() {
+  clearInterval(timer);
+  timer = null;
+  localStorage.removeItem('startTimestamp');
+  startTimestamp = null;
+  lapCount = 0;
+  laps = [];
+  updateTimerDisplay(raceDuration);
+  lapDisplay.textContent = lapCount;
+  summaryDisplay.innerHTML = '';
+
+  // Ask for new Runner Name
+  const newName = prompt("Enter the new Runner's Name (or OK to reuse last):");
+  if (newName) {
+    runnerName = newName.trim().replace(/\s+/g, '_');
+  }
+}
+
 // --- Event Listeners --- //
 startButton.addEventListener('click', startRace);
-
 addLapButton.addEventListener('click', function() {
   lapCount++;
   lapDisplay.textContent = lapCount;
   recordLap();
 });
-
 subtractLapButton.addEventListener('click', function() {
   if (lapCount > 0) {
     lapCount--;
@@ -184,11 +248,15 @@ subtractLapButton.addEventListener('click', function() {
     updateLapLog();
   }
 });
+resetButton.addEventListener('click', resetRace);
 
 // --- On Page Load --- //
 window.onload = function() {
-  setRandomBackground();  // 🎨 Colorful background first!
+  setRandomBackground();
   authenticateAdmin();
+
+  runnerName = prompt("Enter the Runner's Name:") || 'Runner';
+  runnerName = runnerName.trim().replace(/\s+/g, '_');
 
   if (localStorage.getItem('startTimestamp')) {
     startTimestamp = parseInt(localStorage.getItem('startTimestamp'), 10);
