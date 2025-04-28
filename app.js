@@ -69,14 +69,14 @@ function updateRaceClock() {
 function startRace() {
   if (isAdmin) {
     const now = Date.now();
-    startTimestamp = now;
-    localStorage.setItem('startTimestamp', startTimestamp);
+    startTimestamp = now;                           // Local memory first
+    localStorage.setItem('startTimestamp', now);     // Save to localStorage
 
     if (timer) {
       clearInterval(timer);
     }
-    updateRaceClock(); // <<< immediate update
-    timer = setInterval(updateRaceClock, 1000); // <<< start ticking
+    updateRaceClock();                               // Immediately update the timer
+    timer = setInterval(updateRaceClock, 1000);       // Start ticking every second
   }
 }
 
@@ -289,15 +289,6 @@ window.onload = function() {
   }
 
   lapDisplay.textContent = lapCount;
-
-  // Watch LocalStorage every second
-  setInterval(() => {
-    const liveTimestamp = localStorage.getItem('startTimestamp');
-    if (liveTimestamp && !startTimestamp) {
-      startTimestamp = parseInt(liveTimestamp, 10);
-      timer = setInterval(updateRaceClock, 1000);
-    }
-  }, 1000);
 };
 
 // --- Event Listeners --- //
