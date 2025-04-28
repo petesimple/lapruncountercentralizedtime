@@ -1,6 +1,6 @@
 let timer;
-const raceDuration = 33 * 60 + 20; // total race time in seconds
-// const raceDuration = 20; // Uncomment for quick testing
+//const raceDuration = 33 * 60 + 20; // total race time in seconds
+const raceDuration = 20; // Uncomment for quick testing
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
