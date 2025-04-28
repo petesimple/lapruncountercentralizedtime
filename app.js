@@ -16,7 +16,7 @@ const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
 
-// --- Random Tie-Dye Background --- //
+// --- Fun Random Tie-Dye Background --- //
 function setRandomBackground() {
   const colors = [
     '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF',
@@ -29,7 +29,7 @@ function setRandomBackground() {
   document.body.style.setProperty('--background-gradient', gradient);
 }
 
-// --- Admin Authentication --- //
+// --- Admin Authentication via URL --- //
 function authenticateAdmin() {
   const urlParams = new URLSearchParams(window.location.search);
   const adminCode = urlParams.get('admin');
@@ -61,15 +61,17 @@ function updateRaceClock() {
   }
 }
 
+// --- NEW: Always allow Admins to start fresh --- //
 function startRace() {
-  if (!localStorage.getItem('startTimestamp') && isAdmin) {
+  if (isAdmin) {
     startTimestamp = Date.now();
     localStorage.setItem('startTimestamp', startTimestamp);
+    clearInterval(timer);
     timer = setInterval(updateRaceClock, 1000);
   }
 }
 
-// --- Lap Recording --- //
+// --- Lap Recording Functions --- //
 function recordLap() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -198,7 +200,7 @@ function showToast(message) {
   }, 1200);
 }
 
-// --- Master Reset (Save Option) --- //
+// --- Master Reset (with Save First) --- //
 function resetRace() {
   if (laps.length > 0) {
     const saveFirst = confirm("Do you want to save the current race results before resetting?");
@@ -226,7 +228,6 @@ function actuallyResetRace() {
   lapDisplay.textContent = lapCount;
   summaryDisplay.innerHTML = '';
 
-  // Ask for new Runner Name
   const newName = prompt("Enter the new Runner's Name (or OK to reuse last):");
   if (newName) {
     runnerName = newName.trim().replace(/\s+/g, '_');
