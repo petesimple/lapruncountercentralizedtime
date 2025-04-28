@@ -1,13 +1,13 @@
 let timer;
 //const raceDuration = 33 * 60 + 20; // total race time in seconds
-const raceDuration = 20; // total race time in seconds TEST TIMER
+const raceDuration = 20; // total race time in seconds TEST
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
 let isAdmin = false;
 let runnerName = 'Runner';
 let totalDistanceMeters = 0;
-let finalStats = ''; // New: store full final stats
+let finalStats = '';
 
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
@@ -65,10 +65,11 @@ function updateRaceClock() {
   }
 }
 
-// --- Start Race --- //
+// --- Start Race (Admin Only) --- //
 function startRace() {
   if (isAdmin) {
-    startTimestamp = Date.now();
+    const now = Date.now();
+    startTimestamp = now;
     localStorage.setItem('startTimestamp', startTimestamp);
     clearInterval(timer);
     timer = setInterval(updateRaceClock, 1000);
@@ -95,7 +96,7 @@ function updateLapLog() {
   }
 }
 
-// --- Finish Race --- //
+// --- Race Finish --- //
 function finishRace() {
   generateResultsTable();
   launchConfetti();
@@ -125,7 +126,7 @@ function askExtraDistance() {
   const avgLapFormatted = `${avgLapMinutes}:${avgLapRemainSeconds}`;
 
   finalStats = `
-Total Distance: 
+Total Distance:
 ${totalDistanceMeters.toFixed(1)} meters
 ${totalDistanceKm} kilometers
 ${totalDistanceFeet} feet
@@ -192,7 +193,6 @@ function exportTableToCSV() {
   const downloadLink = document.createElement('a');
   downloadLink.download = filename;
   downloadLink.href = window.URL.createObjectURL(csvFile);
-  downloadLink.style.display = 'none';
   document.body.appendChild(downloadLink);
   downloadLink.click();
   document.body.removeChild(downloadLink);
@@ -278,15 +278,7 @@ window.onload = function() {
 
   const savedTimestamp = localStorage.getItem('startTimestamp');
   if (savedTimestamp) {
-    const now = Date.now();
-    const elapsed = (now - parseInt(savedTimestamp, 10)) / 1000;
-    if (elapsed > raceDuration) {
-      localStorage.removeItem('startTimestamp');
-    }
-  }
-
-  if (localStorage.getItem('startTimestamp')) {
-    startTimestamp = parseInt(localStorage.getItem('startTimestamp'), 10);
+    startTimestamp = parseInt(savedTimestamp, 10);
     timer = setInterval(updateRaceClock, 1000);
   } else {
     updateTimerDisplay(raceDuration);
