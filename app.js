@@ -1,12 +1,13 @@
 let timer;
 //const raceDuration = 33 * 60 + 20; // total race time in seconds
-const raceDuration = 20; // test time
+const raceDuration = 20; // total race time in seconds TEST TIMER
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
 let isAdmin = false;
 let runnerName = 'Runner';
 let totalDistanceMeters = 0;
+let finalStats = ''; // New: store full final stats
 
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
@@ -64,7 +65,7 @@ function updateRaceClock() {
   }
 }
 
-// --- Always Allow Admin Start --- //
+// --- Start Race --- //
 function startRace() {
   if (isAdmin) {
     startTimestamp = Date.now();
@@ -94,29 +95,47 @@ function updateLapLog() {
   }
 }
 
-// --- Race Finish --- //
+// --- Finish Race --- //
 function finishRace() {
   generateResultsTable();
   launchConfetti();
   airhorn.play();
 
-  setTimeout(askExtraDistance, 1500); // After confetti celebration
+  setTimeout(askExtraDistance, 1500); // After confetti
 }
 
-// --- Ask for Lane Type and Extra Distance --- //
+// --- Ask Lane Type and Extra Distance --- //
 function askExtraDistance() {
   const laneChoice = prompt("Lane Type? Type 'inside' or 'outside'").toLowerCase();
-  let lapLength = 400; // Default to inside
+  let lapLength = 400;
   if (laneChoice === 'outside') {
-    lapLength = 415; // Example for outside lanes
+    lapLength = 415;
   }
 
   const extraMeters = parseFloat(prompt("Extra meters completed beyond last full lap (if any):")) || 0;
 
   totalDistanceMeters = (lapCount * lapLength) + extraMeters;
   const totalDistanceKm = (totalDistanceMeters / 1000).toFixed(2);
+  const totalDistanceFeet = (totalDistanceMeters * 3.28084).toFixed(1);
+  const totalDistanceMiles = (totalDistanceMeters / 1609.34).toFixed(2);
 
-  summaryDisplay.innerHTML += `<br><br><strong>Total Distance:</strong> ${totalDistanceMeters.toFixed(1)} meters (~${totalDistanceKm} km)`;
+  let avgLapSeconds = raceDuration / (lapCount || 1);
+  const avgLapMinutes = Math.floor(avgLapSeconds / 60);
+  const avgLapRemainSeconds = Math.round(avgLapSeconds % 60).toString().padStart(2, '0');
+  const avgLapFormatted = `${avgLapMinutes}:${avgLapRemainSeconds}`;
+
+  finalStats = `
+Total Distance: 
+${totalDistanceMeters.toFixed(1)} meters
+${totalDistanceKm} kilometers
+${totalDistanceFeet} feet
+${totalDistanceMiles} miles
+
+Average Lap Pace:
+${avgLapFormatted} per lap
+`;
+
+  summaryDisplay.innerHTML += `<br><br><strong>${finalStats.replace(/\n/g, '<br>')}</strong>`;
 }
 
 // --- Results Table and Download CSV --- //
@@ -154,9 +173,9 @@ function exportTableToCSV() {
   }
 
   if (totalDistanceMeters > 0) {
-    csv.push(`,`);
-    csv.push(`Total Distance (meters),${totalDistanceMeters.toFixed(1)}`);
-    csv.push(`Total Distance (km),${(totalDistanceMeters / 1000).toFixed(2)}`);
+    csv.push('');
+    csv.push('----- Final Stats -----');
+    finalStats.trim().split('\n').forEach(line => csv.push(line.replace(': ', ',')));
   }
 
   const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
@@ -216,10 +235,10 @@ function showToast(message) {
   }, 1200);
 }
 
-// --- Master Reset (Save First) --- //
+// --- Master Reset --- //
 function resetRace() {
   if (laps.length > 0) {
-    const saveFirst = confirm("Do you want to save the current race results before resetting?");
+    const saveFirst = confirm("Save the current race before resetting?");
     if (saveFirst) {
       exportTableToCSV();
       showToast("✅ Results Saved!");
