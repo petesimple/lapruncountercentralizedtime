@@ -1,11 +1,11 @@
 let timer;
 const raceDuration = 33 * 60 + 20; // total race time in seconds
-// const raceDuration = 20; // Uncomment for quick test
+// const raceDuration = 20; // Uncomment for quick testing
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
 let isAdmin = false;
-let runnerName = 'Runner'; // New!
+let runnerName = 'Runner'; // Store runner name
 
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
@@ -36,9 +36,11 @@ function authenticateAdmin() {
   if (adminCode === 'letmein') {
     isAdmin = true;
     startButton.style.display = "inline-block";
+    resetButton.style.display = "inline-block"; // ✅ Master Reset is now Admin-only
   } else {
     isAdmin = false;
     startButton.style.display = "none";
+    resetButton.style.display = "none"; // Hide Reset for non-Admins
   }
 }
 
@@ -71,7 +73,7 @@ function startRace() {
   }
 }
 
-// --- Lap Recording --- //
+// --- Lap Recording Functions --- //
 function recordLap() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -181,18 +183,7 @@ function launchConfetti() {
 function showToast(message) {
   const toast = document.createElement('div');
   toast.textContent = message;
-  toast.style.position = 'fixed';
-  toast.style.bottom = '20px';
-  toast.style.left = '50%';
-  toast.style.transform = 'translateX(-50%)';
-  toast.style.background = '#4CAF50';
-  toast.style.color = 'white';
-  toast.style.padding = '10px 20px';
-  toast.style.borderRadius = '8px';
-  toast.style.fontSize = '1rem';
-  toast.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
-  toast.style.opacity = '0.95';
-  toast.style.zIndex = '9999';
+  toast.className = "toast";
   document.body.appendChild(toast);
 
   setTimeout(() => {
@@ -200,14 +191,13 @@ function showToast(message) {
   }, 1200);
 }
 
-// --- Master Reset (with Save First) --- //
+// --- Master Reset (Save First) --- //
 function resetRace() {
   if (laps.length > 0) {
     const saveFirst = confirm("Do you want to save the current race results before resetting?");
     if (saveFirst) {
       exportTableToCSV();
       showToast("✅ Results Saved!");
-
       setTimeout(() => {
         actuallyResetRace();
       }, 1500);
@@ -234,7 +224,7 @@ function actuallyResetRace() {
   }
 }
 
-// --- On Page Load --- //
+// --- Page Load --- //
 window.onload = function() {
   setRandomBackground();
   authenticateAdmin();
