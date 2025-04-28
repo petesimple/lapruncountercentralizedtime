@@ -29,7 +29,7 @@ function setRandomBackground() {
   document.body.style.setProperty('--background-gradient', gradient);
 }
 
-// --- Admin Authentication via URL --- //
+// --- Admin Authentication --- //
 function authenticateAdmin() {
   const urlParams = new URLSearchParams(window.location.search);
   const adminCode = urlParams.get('admin');
@@ -61,7 +61,7 @@ function updateRaceClock() {
   }
 }
 
-// --- NEW: Always allow Admins to start fresh --- //
+// --- Always Allow Admin Start --- //
 function startRace() {
   if (isAdmin) {
     startTimestamp = Date.now();
@@ -71,7 +71,7 @@ function startRace() {
   }
 }
 
-// --- Lap Recording Functions --- //
+// --- Lap Recording --- //
 function recordLap() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -234,6 +234,34 @@ function actuallyResetRace() {
   }
 }
 
+// --- On Page Load --- //
+window.onload = function() {
+  setRandomBackground();
+  authenticateAdmin();
+
+  runnerName = prompt("Enter the Runner's Name:") || 'Runner';
+  runnerName = runnerName.trim().replace(/\s+/g, '_');
+
+  // Clean up any expired old race timestamp
+  const savedTimestamp = localStorage.getItem('startTimestamp');
+  if (savedTimestamp) {
+    const now = Date.now();
+    const elapsed = (now - parseInt(savedTimestamp, 10)) / 1000;
+    if (elapsed > raceDuration) {
+      localStorage.removeItem('startTimestamp');
+    }
+  }
+
+  if (localStorage.getItem('startTimestamp')) {
+    startTimestamp = parseInt(localStorage.getItem('startTimestamp'), 10);
+    timer = setInterval(updateRaceClock, 1000);
+  } else {
+    updateTimerDisplay(raceDuration);
+  }
+
+  lapDisplay.textContent = lapCount;
+};
+
 // --- Event Listeners --- //
 startButton.addEventListener('click', startRace);
 addLapButton.addEventListener('click', function() {
@@ -250,20 +278,3 @@ subtractLapButton.addEventListener('click', function() {
   }
 });
 resetButton.addEventListener('click', resetRace);
-
-// --- On Page Load --- //
-window.onload = function() {
-  setRandomBackground();
-  authenticateAdmin();
-
-  runnerName = prompt("Enter the Runner's Name:") || 'Runner';
-  runnerName = runnerName.trim().replace(/\s+/g, '_');
-
-  if (localStorage.getItem('startTimestamp')) {
-    startTimestamp = parseInt(localStorage.getItem('startTimestamp'), 10);
-    timer = setInterval(updateRaceClock, 1000);
-  } else {
-    updateTimerDisplay(raceDuration);
-  }
-  lapDisplay.textContent = lapCount;
-};
