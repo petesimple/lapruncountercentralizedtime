@@ -1,6 +1,5 @@
 let timer;
-//const raceDuration = 33 * 60 + 20; // total race time in seconds
-const raceDuration = 20; // total race time in seconds TEST
+const raceDuration = 33 * 60 + 20; // total race time in seconds
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
@@ -285,6 +284,15 @@ window.onload = function() {
   }
 
   lapDisplay.textContent = lapCount;
+
+  // --- New: Watch LocalStorage Every Second for StartTimestamp Sync --- //
+  setInterval(() => {
+    const liveTimestamp = localStorage.getItem('startTimestamp');
+    if (liveTimestamp && !startTimestamp) {
+      startTimestamp = parseInt(liveTimestamp, 10);
+      timer = setInterval(updateRaceClock, 1000);
+    }
+  }, 1000);
 };
 
 // --- Event Listeners --- //
