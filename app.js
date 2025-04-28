@@ -1,9 +1,9 @@
 let timer;
-const raceDuration = 33 * 60 + 20;
+const raceDuration = 33 * 60 + 20; // Total race time in seconds
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
-let isAdmin = false; // New flag!
+let isAdmin = false; // Admin control flag
 
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
@@ -13,19 +13,20 @@ const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
 
-// --- Admin Protection --- //
+// --- Admin Authentication via URL --- //
 function authenticateAdmin() {
-  const answer = prompt("Admin access? Enter code:");
-  if (answer === "letmein") {
+  const urlParams = new URLSearchParams(window.location.search);
+  const adminCode = urlParams.get('admin');
+  if (adminCode === 'letmein') { // << You can change 'letmein' to any secret you want
     isAdmin = true;
-    startButton.style.display = "inline-block"; // Show button
+    startButton.style.display = "inline-block";
   } else {
     isAdmin = false;
-    startButton.style.display = "none"; // Hide button
+    startButton.style.display = "none";
   }
 }
 
-// --- Timer Functions --- //
+// --- Timer Display and Countdown --- //
 function updateTimerDisplay(timeRemaining) {
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
@@ -52,6 +53,7 @@ function startRace() {
   }
 }
 
+// --- Lap Recording and Display --- //
 function recordLap() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -71,6 +73,7 @@ function updateLapLog() {
   }
 }
 
+// --- Race Finish and Results Table --- //
 function finishRace() {
   generateResultsTable();
   launchConfetti();
@@ -90,6 +93,7 @@ function generateResultsTable() {
   summaryDisplay.innerHTML = html;
 }
 
+// --- Confetti Celebration --- //
 function launchConfetti() {
   const duration = 3 * 1000;
   const end = Date.now() + duration;
@@ -114,13 +118,15 @@ function launchConfetti() {
   })();
 }
 
-// --- Button Listeners --- //
+// --- Event Listeners --- //
 startButton.addEventListener('click', startRace);
+
 addLapButton.addEventListener('click', function() {
   lapCount++;
   lapDisplay.textContent = lapCount;
   recordLap();
 });
+
 subtractLapButton.addEventListener('click', function() {
   if (lapCount > 0) {
     lapCount--;
@@ -130,7 +136,7 @@ subtractLapButton.addEventListener('click', function() {
   }
 });
 
-// --- On Load --- //
+// --- Initialization on Page Load --- //
 window.onload = function() {
   authenticateAdmin();
   
