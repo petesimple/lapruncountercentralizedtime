@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LP Run Lap Counter</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🏃 LP Run Lap Counter</h1>
+
+    <div id="timer">33:20</div>
+
+    <button id="startButton">Start Race</button>
+
+    <div class="lap-controls">
+      <h2>Laps: <span id="lapCount">0</span></h2>
+      <button id="addLap">+1 Lap</button>
+      <button id="subtractLap">-1 Lap</button>
+    </div>
+
+    <div id="summary"></div>
+
+    <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
+    <script src="app.js"></script>
+</body>
+</html>
