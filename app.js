@@ -13,6 +13,22 @@ const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
 
+// --- Fun Random Tie-Dye Background --- //
+function setRandomBackground() {
+  const colors = [
+    '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF',
+    '#FF6FF2', '#FFA45B', '#42E2B8', '#C08497',
+    '#F2BE22', '#7BDFF2', '#B28DFF'
+  ];
+  
+  const pickColor = () => colors[Math.floor(Math.random() * colors.length)];
+  
+  const gradient = `radial-gradient(circle at ${Math.floor(Math.random() * 100)}% ${Math.floor(Math.random() * 100)}%, 
+    ${pickColor()}, ${pickColor()}, ${pickColor()})`;
+    
+  document.body.style.setProperty('--background-gradient', gradient);
+}
+
 // --- Admin Authentication via URL --- //
 function authenticateAdmin() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -170,6 +186,7 @@ subtractLapButton.addEventListener('click', function() {
 
 // --- On Page Load --- //
 window.onload = function() {
+  setRandomBackground();  // 🎨 Colorful background first!
   authenticateAdmin();
 
   if (localStorage.getItem('startTimestamp')) {
