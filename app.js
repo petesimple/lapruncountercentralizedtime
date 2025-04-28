@@ -1,11 +1,12 @@
 let timer;
 //const raceDuration = 33 * 60 + 20; // total race time in seconds
-const raceDuration = 20; // Uncomment for quick testing
+const raceDuration = 20; // test time
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
 let isAdmin = false;
-let runnerName = 'Runner'; // Store runner name
+let runnerName = 'Runner';
+let totalDistanceMeters = 0;
 
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
@@ -36,11 +37,11 @@ function authenticateAdmin() {
   if (adminCode === 'letmein') {
     isAdmin = true;
     startButton.style.display = "inline-block";
-    resetButton.style.display = "inline-block"; // ✅ Master Reset is now Admin-only
+    resetButton.style.display = "inline-block";
   } else {
     isAdmin = false;
     startButton.style.display = "none";
-    resetButton.style.display = "none"; // Hide Reset for non-Admins
+    resetButton.style.display = "none";
   }
 }
 
@@ -98,6 +99,24 @@ function finishRace() {
   generateResultsTable();
   launchConfetti();
   airhorn.play();
+
+  setTimeout(askExtraDistance, 1500); // After confetti celebration
+}
+
+// --- Ask for Lane Type and Extra Distance --- //
+function askExtraDistance() {
+  const laneChoice = prompt("Lane Type? Type 'inside' or 'outside'").toLowerCase();
+  let lapLength = 400; // Default to inside
+  if (laneChoice === 'outside') {
+    lapLength = 415; // Example for outside lanes
+  }
+
+  const extraMeters = parseFloat(prompt("Extra meters completed beyond last full lap (if any):")) || 0;
+
+  totalDistanceMeters = (lapCount * lapLength) + extraMeters;
+  const totalDistanceKm = (totalDistanceMeters / 1000).toFixed(2);
+
+  summaryDisplay.innerHTML += `<br><br><strong>Total Distance:</strong> ${totalDistanceMeters.toFixed(1)} meters (~${totalDistanceKm} km)`;
 }
 
 // --- Results Table and Download CSV --- //
@@ -132,6 +151,12 @@ function exportTableToCSV() {
       row.push(data);
     }
     csv.push(row.join(','));
+  }
+
+  if (totalDistanceMeters > 0) {
+    csv.push(`,`);
+    csv.push(`Total Distance (meters),${totalDistanceMeters.toFixed(1)}`);
+    csv.push(`Total Distance (km),${(totalDistanceMeters / 1000).toFixed(2)}`);
   }
 
   const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
@@ -232,7 +257,6 @@ window.onload = function() {
   runnerName = prompt("Enter the Runner's Name:") || 'Runner';
   runnerName = runnerName.trim().replace(/\s+/g, '_');
 
-  // Clean up any expired old race timestamp
   const savedTimestamp = localStorage.getItem('startTimestamp');
   if (savedTimestamp) {
     const now = Date.now();
