@@ -15,7 +15,13 @@
       background: var(--background-gradient, #f0f0f0);
     }
     h1 {
-      margin-bottom: 10px;
+      margin-bottom: 5px;
+    }
+    #runnerNameDisplay {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #333;
     }
     #timer {
       font-size: 3em;
@@ -39,7 +45,7 @@
     }
   </style>
 
-  <!-- Firebase SDKs (NO imports needed) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
@@ -47,6 +53,8 @@
 
   <div class="container">
     <h1>🏃 LP Run Lap Counter</h1>
+
+    <div id="runnerNameDisplay">(Runner Name Here)</div>
 
     <div id="timer">33:20</div>
 
@@ -63,10 +71,8 @@
     <button id="resetButton" style="display:none;">Master Reset</button>
   </div>
 
-  <!-- Airhorn Sound -->
   <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
 
-  <!-- Your App Logic -->
   <script src="app.js"></script>
 
 </body>
