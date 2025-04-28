@@ -11,23 +11,26 @@
   <div class="container">
     <h1>🏃 LP Run Lap Counter</h1>
 
+    <!-- Timer Display -->
     <div id="timer">33:20</div>
 
-    <!-- Start Race button (Admin-only visible) -->
+    <!-- Admin Start Button -->
     <button id="startButton" style="display:none;">Start Race</button>
 
+    <!-- Lap Controls -->
     <div class="lap-controls">
       <h2>Laps: <span id="lapCount">0</span></h2>
       <button id="addLap">+1 Lap</button>
       <button id="subtractLap">-1 Lap</button>
     </div>
 
-    <!-- Master Reset button (Admin-only visible) -->
+    <!-- Admin Master Reset Button -->
     <button id="resetButton" style="display:none; margin-top: 20px;">Master Reset</button>
 
+    <!-- Summary Section (Results / Total Distance / Download CSV) -->
     <div id="summary"></div>
 
-    <!-- Preload airhorn sound for race finish -->
+    <!-- Preload Airhorn Sound for Race Finish -->
     <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
   </div>
 
