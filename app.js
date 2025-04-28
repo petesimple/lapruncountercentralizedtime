@@ -33,6 +33,7 @@ const resetButton = document.getElementById('resetButton');
 const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
+const runnerNameDisplay = document.getElementById('runnerNameDisplay');
 
 // --- Tie-Dye Background --- //
 function setRandomBackground() {
@@ -106,18 +107,19 @@ db.ref('race/startTimestamp').on('value', (snapshot) => {
   }
 });
 
-// --- Race Finish (Simple version for now) --- //
+// --- Race Finish --- //
 function finishRace() {
   clearInterval(timer);
   timer = null;
   timerDisplay.textContent = "Race Finished!";
+  airhorn.play();
 }
 
 // --- Reset Race --- //
 function resetRace() {
   if (isAdmin) {
-    db.ref('race').set({}); // Clear startTimestamp
-    location.reload();      // Reload page
+    db.ref('race').set({});
+    location.reload();
   }
 }
 
@@ -129,6 +131,9 @@ window.onload = function() {
 
   runnerName = prompt("Enter the Runner's Name:") || 'Runner';
   runnerName = runnerName.trim().replace(/\s+/g, '_');
+
+  // Show runner name on page
+  runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
 };
 
 // --- Event Listeners --- //
