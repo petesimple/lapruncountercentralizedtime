@@ -1,12 +1,12 @@
 :root {
-  --background-gradient: #ffffff; /* fallback color if JS fails */
+  --background-gradient: #ffffff; /* fallback if JavaScript fails */
 }
 
 body {
   font-family: Arial, sans-serif;
   text-align: center;
   padding: 2rem;
-  background: var(--background-gradient);
+  background: var(--background-gradient); /* Use random tie-dye gradient! */
   background-size: cover;
   background-attachment: fixed;
   min-height: 100vh;
@@ -16,7 +16,7 @@ body {
 .container {
   max-width: 400px;
   margin: auto;
-  background: rgba(255, 255, 255, 0.85); /* Semi-transparent white panel */
+  background: rgba(255, 255, 255, 0.85); /* semi-transparent white card */
   padding: 2rem;
   border-radius: 15px;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
@@ -61,7 +61,7 @@ button:hover {
   color: #333;
 }
 
-/* Style for Results Table */
+/* Table Styles */
 #resultsTable {
   width: 100%;
   margin-top: 1rem;
@@ -83,7 +83,7 @@ button:hover {
   background-color: #fafafa;
 }
 
-/* Download CSV Button Style */
+/* Download CSV Button */
 #downloadCSV {
   background-color: #4CAF50;
   color: white;
