@@ -47,18 +47,36 @@ function recordLap() {
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
   const lapTime = minutes + ':' + seconds.toString().padStart(2, '0');
-  laps.push('Lap ' + lapCount + ' - ' + lapTime);
+  laps.push({ lap: lapCount, time: lapTime });
   updateLapLog();
 }
 
 function updateLapLog() {
-  summaryDisplay.innerHTML = laps.join('<br>');
+  // Only update if race is still ongoing
+  if (timer) {
+    summaryDisplay.innerHTML = laps.map(lapObj => 
+      'Lap ' + lapObj.lap + ' - ' + lapObj.time
+    ).join('<br>');
+  }
 }
 
 function finishRace() {
-  summaryDisplay.innerHTML += '<br><strong>Race Finished!</strong>';
+  generateResultsTable();
   launchConfetti();
   airhorn.play();
+}
+
+function generateResultsTable() {
+  let html = '<h2>🏁 Race Results</h2>';
+  html += '<table style="margin:auto; border-collapse: collapse;">';
+  html += '<tr><th style="border:1px solid black; padding:5px;">Lap</th><th style="border:1px solid black; padding:5px;">Time Remaining</th></tr>';
+
+  laps.forEach(lapObj => {
+    html += '<tr><td style="border:1px solid black; padding:5px;">' + lapObj.lap + '</td><td style="border:1px solid black; padding:5px;">' + lapObj.time + '</td></tr>';
+  });
+
+  html += '</table>';
+  summaryDisplay.innerHTML = html;
 }
 
 function launchConfetti() {
