@@ -4,36 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LP Run Lap Counter</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+
+  <!-- Tie-Dye Background Style -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      background: var(--background-gradient, #f0f0f0);
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #timer {
+      font-size: 3em;
+      margin: 20px 0;
+    }
+    .lap-controls button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+    #summary {
+      margin-top: 20px;
+    }
+    button {
+      cursor: pointer;
+    }
+    #startButton, #resetButton {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 1.2em;
+    }
+  </style>
+
+  <!-- Firebase SDKs (NO imports needed) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
+
   <div class="container">
     <h1>🏃 LP Run Lap Counter</h1>
 
-    <!-- Timer Display -->
     <div id="timer">33:20</div>
 
-    <!-- Admin Start Button -->
-    <button id="startButton" style="display:none;">Start Race</button>
+    <button id="startButton">Start Race</button>
 
-    <!-- Lap Controls -->
     <div class="lap-controls">
       <h2>Laps: <span id="lapCount">0</span></h2>
       <button id="addLap">+1 Lap</button>
       <button id="subtractLap">-1 Lap</button>
     </div>
 
-    <!-- Admin Master Reset Button -->
-    <button id="resetButton" style="display:none; margin-top: 20px;">Master Reset</button>
-
-    <!-- Summary Section (Results / Total Distance / Download CSV) -->
     <div id="summary"></div>
 
-    <!-- Preload Airhorn Sound for Race Finish -->
-    <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
+    <button id="resetButton" style="display:none;">Master Reset</button>
   </div>
 
+  <!-- Airhorn Sound -->
+  <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
+
+  <!-- Your App Logic -->
   <script src="app.js"></script>
+
 </body>
 </html>
