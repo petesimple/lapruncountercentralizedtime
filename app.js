@@ -1,5 +1,5 @@
 let timer;
-const raceDuration = 33 * 60 + 20; // Total race time in seconds
+const raceDuration = 33 * 60 + 20; // total race time in seconds
 let startTimestamp;
 let lapCount = 0;
 let laps = [];
@@ -26,7 +26,7 @@ function authenticateAdmin() {
   }
 }
 
-// --- Timer Display and Countdown --- //
+// --- Timer Functions --- //
 function updateTimerDisplay(timeRemaining) {
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
@@ -53,7 +53,7 @@ function startRace() {
   }
 }
 
-// --- Lap Recording and Display --- //
+// --- Lap Recording Functions --- //
 function recordLap() {
   const now = Date.now();
   const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -73,24 +73,56 @@ function updateLapLog() {
   }
 }
 
-// --- Race Finish and Results Table --- //
+// --- Race Finish --- //
 function finishRace() {
   generateResultsTable();
   launchConfetti();
   airhorn.play();
 }
 
+// --- Results Table and Download CSV --- //
 function generateResultsTable() {
   let html = '<h2>🏁 Race Results</h2>';
-  html += '<table style="margin:auto; border-collapse: collapse;">';
+  html += '<table id="resultsTable" style="margin:auto; border-collapse: collapse;">';
   html += '<tr><th style="border:1px solid black; padding:5px;">Lap</th><th style="border:1px solid black; padding:5px;">Time Remaining</th></tr>';
 
   laps.forEach(lapObj => {
-    html += '<tr><td style="border:1px solid black; padding:5px;">' + lapObj.lap + '</td><td style="border:1px solid black; padding:5px;">' + lapObj.time + '</td></tr>';
+    html += `<tr><td style="border:1px solid black; padding:5px;">${lapObj.lap}</td><td style="border:1px solid black; padding:5px;">${lapObj.time}</td></tr>`;
   });
 
   html += '</table>';
+  html += '<br><button id="downloadCSV" style="margin-top:10px;">Download CSV</button>';
   summaryDisplay.innerHTML = html;
+
+  // Add event listener for download button
+  document.getElementById('downloadCSV').addEventListener('click', exportTableToCSV);
+}
+
+function exportTableToCSV() {
+  const table = document.getElementById('resultsTable');
+  let csv = [];
+  const rows = table.querySelectorAll('tr');
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = [], cols = rows[i].querySelectorAll('td, th');
+    for (let j = 0; j < cols.length; j++) {
+      let data = cols[j].innerText.replace(/"/g, '""');
+      if (data.includes(',') || data.includes('"') || data.includes('\n')) {
+        data = `"${data}"`;
+      }
+      row.push(data);
+    }
+    csv.push(row.join(','));
+  }
+
+  const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+  const downloadLink = document.createElement('a');
+  downloadLink.download = 'lap_results.csv';
+  downloadLink.href = window.URL.createObjectURL(csvFile);
+  downloadLink.style.display = 'none';
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
 }
 
 // --- Confetti Celebration --- //
@@ -136,10 +168,10 @@ subtractLapButton.addEventListener('click', function() {
   }
 });
 
-// --- Initialization on Page Load --- //
+// --- On Page Load --- //
 window.onload = function() {
   authenticateAdmin();
-  
+
   if (localStorage.getItem('startTimestamp')) {
     startTimestamp = parseInt(localStorage.getItem('startTimestamp'), 10);
     timer = setInterval(updateRaceClock, 1000);
