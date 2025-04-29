@@ -83,13 +83,11 @@ function updateRaceClock() {
   }
 }
 
-// --- Admin Starts Race --- //
+// --- Admin Starts Race (Corrected for Rules) --- //
 function startRace() {
   if (isAdmin) {
     const now = Date.now();
-    db.ref('race').set({
-      startTimestamp: now
-    });
+    db.ref('race/startTimestamp').set(now);  // ✅ Save only number
   }
 }
 
@@ -118,7 +116,7 @@ function finishRace() {
 // --- Reset Race --- //
 function resetRace() {
   if (isAdmin) {
-    db.ref('race').set({});
+    db.ref('race').set({}); // Clear race node
     location.reload();
   }
 }
