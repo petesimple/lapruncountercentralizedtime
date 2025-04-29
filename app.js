@@ -89,10 +89,7 @@ function updateRaceClock() {
 // --- Admin Starts Race --- //
 function startRace() {
   if (isAdmin) {
-    db.ref('race').update({
-      startTimestamp: Date.now(),
-      resetReason: null
-    });
+    db.ref('race/startTimestamp').set(Date.now());
   }
 }
 
@@ -124,13 +121,9 @@ function resetRace() {
   }
 }
 
-// --- Listen for Race State Changes --- //
-db.ref('race').on('value', (snapshot) => {
-  const data = snapshot.val();
-  if (!data) return;
-
-  const startTime = data.startTimestamp;
-  const resetReason = data.resetReason;
+// --- Listen for startTimestamp changes --- //
+db.ref('race/startTimestamp').on('value', (snapshot) => {
+  const startTime = snapshot.val();
 
   if (startTime) {
     startTimestamp = startTime;
@@ -147,19 +140,26 @@ db.ref('race').on('value', (snapshot) => {
     updateTimerDisplay(raceDuration);
     lapDisplay.textContent = 0;
     summaryDisplay.innerHTML = '';
-
-    if (resetReason === "masterReset") {
-      runnerName = prompt("Enter the next Runner's Name:") || 'Runner';
-      runnerName = runnerName.trim().replace(/\s+/g, '_');
-      runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
-      alert("✅ Race fully reset. Ready for next runner!");
-    } else if (resetReason === "falseStart") {
-      console.log("⏱️ False Start reset only - continue with same runner.");
-    }
-
-    // Clear the reset reason after handling
-    db.ref('race/resetReason').remove();
   }
+});
+
+// --- Listen for resetReason changes --- //
+db.ref('race/resetReason').on('value', (snapshot) => {
+  const reason = snapshot.val();
+
+  if (!reason) return;
+
+  if (reason === "masterReset") {
+    runnerName = prompt("Enter the next Runner's Name:") || 'Runner';
+    runnerName = runnerName.trim().replace(/\s+/g, '_');
+    runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
+    alert("✅ Race fully reset. Ready for next runner!");
+  } else if (reason === "falseStart") {
+    console.log("⏱️ False Start reset only - continue with same runner.");
+  }
+
+  // Clear the resetReason after handling
+  db.ref('race/resetReason').remove();
 });
 
 // --- Race Finish --- //
