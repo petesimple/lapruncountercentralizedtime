@@ -89,7 +89,7 @@ function updateRaceClock() {
 // --- Admin Starts Race --- //
 function startRace() {
   if (isAdmin) {
-    db.ref('race').set({
+    db.ref('race').update({
       startTimestamp: Date.now(),
       resetReason: null
     });
@@ -99,7 +99,7 @@ function startRace() {
 // --- False Start Reset --- //
 function falseStartReset() {
   if (isAdmin) {
-    db.ref('race').set({
+    db.ref('race').update({
       startTimestamp: null,
       resetReason: "falseStart"
     }).then(() => {
@@ -113,7 +113,7 @@ function falseStartReset() {
 // --- Master Reset --- //
 function resetRace() {
   if (isAdmin) {
-    db.ref('race').set({
+    db.ref('race').update({
       startTimestamp: null,
       resetReason: "masterReset"
     }).then(() => {
@@ -124,7 +124,7 @@ function resetRace() {
   }
 }
 
-// --- Listen for Race State --- //
+// --- Listen for Race State Changes --- //
 db.ref('race').on('value', (snapshot) => {
   const data = snapshot.val();
   if (!data) return;
