@@ -87,7 +87,7 @@ function updateRaceClock() {
 function startRace() {
   if (isAdmin) {
     const now = Date.now();
-    db.ref('race/startTimestamp').set(now);  // ✅ Save only number
+    db.ref('race/startTimestamp').set(now);
   }
 }
 
@@ -95,6 +95,7 @@ function startRace() {
 db.ref('race/startTimestamp').on('value', (snapshot) => {
   const value = snapshot.val();
   if (value) {
+    // Start clock normally
     startTimestamp = value;
 
     if (timer) {
@@ -102,6 +103,15 @@ db.ref('race/startTimestamp').on('value', (snapshot) => {
     }
     updateRaceClock();
     timer = setInterval(updateRaceClock, 1000);
+  } else {
+    // If startTimestamp is deleted (null), reset everything
+    clearInterval(timer);
+    timer = null;
+    startTimestamp = null;
+    updateTimerDisplay(raceDuration);
+    lapDisplay.textContent = 0;
+    summaryDisplay.innerHTML = '';
+    console.log("Timer reset because startTimestamp was cleared.");
   }
 });
 
@@ -136,7 +146,7 @@ function resetRace() {
 // --- Page Load --- //
 window.onload = function() {
   setRandomBackground();
-  authenticateAdmin(); // ✅ moved here after page fully loaded
+  authenticateAdmin();
   lapDisplay.textContent = lapCount;
 
   runnerName = prompt("Enter the Runner's Name:") || 'Runner';
