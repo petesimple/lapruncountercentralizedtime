@@ -123,19 +123,24 @@ function finishRace() {
   airhorn.play();
 }
 
-// --- Proper Master Reset --- //
+// --- Proper Master Reset (with New Runner Prompt) --- //
 function resetRace() {
   if (isAdmin) {
     db.ref('race/startTimestamp').remove().then(() => {
-      // Reset local variables
+      clearInterval(timer);
+      timer = null;
       startTimestamp = null;
       lapCount = 0;
       laps = [];
-      clearInterval(timer);
-      timer = null;
       updateTimerDisplay(raceDuration);
       lapDisplay.textContent = lapCount;
       summaryDisplay.innerHTML = '';
+
+      // Ask for new runner name after reset
+      runnerName = prompt("Enter the next Runner's Name:") || 'Runner';
+      runnerName = runnerName.trim().replace(/\s+/g, '_');
+      runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
+
       alert("✅ Race has been reset. Ready for next runner!");
     }).catch((error) => {
       console.error("Reset failed:", error);
