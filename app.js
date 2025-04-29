@@ -27,9 +27,10 @@ const db = firebase.database();
 // --- DOM Elements --- //
 const timerDisplay = document.getElementById('timer');
 const startButton = document.getElementById('startButton');
+const falseStartButton = document.getElementById('falseStartButton');
+const resetButton = document.getElementById('resetButton');
 const addLapButton = document.getElementById('addLap');
 const subtractLapButton = document.getElementById('subtractLap');
-const resetButton = document.getElementById('resetButton');
 const lapDisplay = document.getElementById('lapCount');
 const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
@@ -56,10 +57,12 @@ function authenticateAdmin() {
     isAdmin = true;
     startButton.style.display = "inline-block";
     resetButton.style.display = "inline-block";
+    falseStartButton.style.display = "inline-block";
   } else {
     isAdmin = false;
     startButton.style.display = "none";
     resetButton.style.display = "none";
+    falseStartButton.style.display = "none";
   }
 }
 
@@ -91,11 +94,53 @@ function startRace() {
   }
 }
 
+// --- False Start Reset --- //
+function falseStartReset() {
+  if (isAdmin) {
+    clearInterval(timer);
+    timer = null;
+    startTimestamp = null;
+    updateTimerDisplay(raceDuration);
+    lapCount = 0;
+    lapDisplay.textContent = lapCount;
+    summaryDisplay.innerHTML = '';
+
+    db.ref('race/startTimestamp').remove().then(() => {
+      console.log("⏱️ False start - race clock reset.");
+    }).catch((error) => {
+      console.error("False Start Reset failed:", error);
+    });
+  }
+}
+
+// --- Master Reset for New Runner --- //
+function resetRace() {
+  if (isAdmin) {
+    db.ref('race/startTimestamp').remove().then(() => {
+      clearInterval(timer);
+      timer = null;
+      startTimestamp = null;
+      lapCount = 0;
+      laps = [];
+      updateTimerDisplay(raceDuration);
+      lapDisplay.textContent = lapCount;
+      summaryDisplay.innerHTML = '';
+
+      runnerName = prompt("Enter the next Runner's Name:") || 'Runner';
+      runnerName = runnerName.trim().replace(/\s+/g, '_');
+      runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
+
+      alert("✅ Race has been reset. Ready for next runner!");
+    }).catch((error) => {
+      console.error("Reset failed:", error);
+    });
+  }
+}
+
 // --- Listen for StartTimestamp from Firebase --- //
 db.ref('race/startTimestamp').on('value', (snapshot) => {
   const value = snapshot.val();
   if (value) {
-    // Start clock normally
     startTimestamp = value;
 
     if (timer) {
@@ -104,7 +149,6 @@ db.ref('race/startTimestamp').on('value', (snapshot) => {
     updateRaceClock();
     timer = setInterval(updateRaceClock, 1000);
   } else {
-    // If startTimestamp is deleted (null), reset everything
     clearInterval(timer);
     timer = null;
     startTimestamp = null;
@@ -123,31 +167,6 @@ function finishRace() {
   airhorn.play();
 }
 
-// --- Proper Master Reset (with New Runner Prompt) --- //
-function resetRace() {
-  if (isAdmin) {
-    db.ref('race/startTimestamp').remove().then(() => {
-      clearInterval(timer);
-      timer = null;
-      startTimestamp = null;
-      lapCount = 0;
-      laps = [];
-      updateTimerDisplay(raceDuration);
-      lapDisplay.textContent = lapCount;
-      summaryDisplay.innerHTML = '';
-
-      // Ask for new runner name after reset
-      runnerName = prompt("Enter the next Runner's Name:") || 'Runner';
-      runnerName = runnerName.trim().replace(/\s+/g, '_');
-      runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
-
-      alert("✅ Race has been reset. Ready for next runner!");
-    }).catch((error) => {
-      console.error("Reset failed:", error);
-    });
-  }
-}
-
 // --- Page Load --- //
 window.onload = function() {
   setRandomBackground();
@@ -161,6 +180,8 @@ window.onload = function() {
 
 // --- Event Listeners --- //
 startButton.addEventListener('click', startRace);
+falseStartButton.addEventListener('click', falseStartReset);
+resetButton.addEventListener('click', resetRace);
 addLapButton.addEventListener('click', function() {
   lapCount++;
   lapDisplay.textContent = lapCount;
@@ -171,4 +192,3 @@ subtractLapButton.addEventListener('click', function() {
     lapDisplay.textContent = lapCount;
   }
 });
-resetButton.addEventListener('click', resetRace);
