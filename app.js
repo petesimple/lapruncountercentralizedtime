@@ -83,7 +83,7 @@ function updateRaceClock() {
   }
 }
 
-// --- Admin Starts Race (Corrected for Rules) --- //
+// --- Admin Starts Race --- //
 function startRace() {
   if (isAdmin) {
     const now = Date.now();
@@ -113,18 +113,30 @@ function finishRace() {
   airhorn.play();
 }
 
-// --- Reset Race --- //
+// --- Proper Master Reset --- //
 function resetRace() {
   if (isAdmin) {
-    db.ref('race').set({}); // Clear race node
-    location.reload();
+    db.ref('race/startTimestamp').remove().then(() => {
+      // Reset local variables
+      startTimestamp = null;
+      lapCount = 0;
+      laps = [];
+      clearInterval(timer);
+      timer = null;
+      updateTimerDisplay(raceDuration);
+      lapDisplay.textContent = lapCount;
+      summaryDisplay.innerHTML = '';
+      alert("✅ Race has been reset. Ready for next runner!");
+    }).catch((error) => {
+      console.error("Reset failed:", error);
+    });
   }
 }
 
 // --- Page Load --- //
 window.onload = function() {
   setRandomBackground();
-  authenticateAdmin(); // ✅ moved here, after full page load
+  authenticateAdmin(); // ✅ moved here after page fully loaded
   lapDisplay.textContent = lapCount;
 
   runnerName = prompt("Enter the Runner's Name:") || 'Runner';
