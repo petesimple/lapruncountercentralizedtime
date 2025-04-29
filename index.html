@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LP Run Lap Counter</title>
 
+  <!-- Tie-Dye Background Style -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -37,10 +38,45 @@
     button {
       cursor: pointer;
     }
-    #startButton, #resetButton, #falseStartButton {
+    #startButton {
       margin: 10px;
       padding: 12px 24px;
       font-size: 1.2em;
+    }
+
+    /* Gear Icon Button */
+    #settingsGear {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 1.8em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+      display: none; /* Only show for admin */
+    }
+
+    /* Settings Menu */
+    #settingsMenu {
+      position: fixed;
+      bottom: 60px;
+      right: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 10px;
+      display: none;
+      z-index: 1001;
+    }
+
+    #settingsMenu button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+      font-size: 0.95em;
     }
   </style>
 
@@ -48,18 +84,14 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
-<body>
 
+<body>
   <div class="container">
     <h1>🏃 LP Run Lap Counter</h1>
 
     <div id="runnerNameDisplay"></div>
-
     <div id="timer">33:20</div>
-
     <button id="startButton">Start Race</button>
-    <button id="falseStartButton" style="display:none;">False Start Reset</button>
-    <button id="resetButton" style="display:none;">Master Reset</button>
 
     <div class="lap-controls">
       <h2>Laps: <span id="lapCount">0</span></h2>
@@ -68,12 +100,18 @@
     </div>
 
     <div id="summary"></div>
+  </div>
 
+  <!-- Floating Gear Icon for Admin Settings -->
+  <button id="settingsGear">⚙️</button>
+
+  <!-- Hidden Settings Menu -->
+  <div id="settingsMenu">
+    <button id="falseStartButton">🚫 False Start Reset</button>
+    <button id="resetButton">🆕 Master Reset</button>
   </div>
 
   <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
-
   <script src="app.js"></script>
-
 </body>
 </html>
