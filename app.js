@@ -99,10 +99,6 @@ function falseStartReset() {
     db.ref('race').update({
       startTimestamp: null,
       resetReason: "falseStart"
-    }).then(() => {
-      console.log("⏱️ False Start Reset triggered.");
-    }).catch((error) => {
-      console.error("False Start Reset failed:", error);
     });
   }
 }
@@ -113,10 +109,6 @@ function resetRace() {
     db.ref('race').update({
       startTimestamp: null,
       resetReason: "masterReset"
-    }).then(() => {
-      console.log("✅ Master Reset triggered.");
-    }).catch((error) => {
-      console.error("Master Reset failed:", error);
     });
   }
 }
@@ -131,8 +123,8 @@ db.ref('race/startTimestamp').on('value', (snapshot) => {
     if (timer) {
       clearInterval(timer);
     }
-    updateRaceClock();
-    timer = setInterval(updateRaceClock, 1000);
+    updateRaceClock(); // immediately update display
+    timer = setInterval(updateRaceClock, 1000); // start ticking
   } else {
     clearInterval(timer);
     timer = null;
