@@ -36,6 +36,9 @@ const summaryDisplay = document.getElementById('summary');
 const airhorn = document.getElementById('airhorn');
 const runnerNameDisplay = document.getElementById('runnerNameDisplay');
 
+const settingsGear = document.getElementById('settingsGear');
+const settingsMenu = document.getElementById('settingsMenu');
+
 // --- Tie-Dye Background --- //
 function setRandomBackground() {
   const colors = [
@@ -56,13 +59,11 @@ function authenticateAdmin() {
   if (adminCode === 'letmein') {
     isAdmin = true;
     startButton.style.display = "inline-block";
-    resetButton.style.display = "inline-block";
-    falseStartButton.style.display = "inline-block";
+    settingsGear.style.display = "inline-block";
   } else {
     isAdmin = false;
     startButton.style.display = "none";
-    resetButton.style.display = "none";
-    falseStartButton.style.display = "none";
+    settingsGear.style.display = "none";
   }
 }
 
@@ -113,7 +114,7 @@ function resetRace() {
   }
 }
 
-// --- Listen for startTimestamp changes --- //
+// --- Firebase Listener for startTimestamp --- //
 db.ref('race/startTimestamp').on('value', (snapshot) => {
   const startTime = snapshot.val();
 
@@ -123,8 +124,8 @@ db.ref('race/startTimestamp').on('value', (snapshot) => {
     if (timer) {
       clearInterval(timer);
     }
-    updateRaceClock(); // immediately update display
-    timer = setInterval(updateRaceClock, 1000); // start ticking
+    updateRaceClock();
+    timer = setInterval(updateRaceClock, 1000);
   } else {
     clearInterval(timer);
     timer = null;
@@ -135,10 +136,9 @@ db.ref('race/startTimestamp').on('value', (snapshot) => {
   }
 });
 
-// --- Listen for resetReason changes --- //
+// --- Firebase Listener for resetReason --- //
 db.ref('race/resetReason').on('value', (snapshot) => {
   const reason = snapshot.val();
-
   if (!reason) return;
 
   if (reason === "masterReset") {
@@ -150,7 +150,6 @@ db.ref('race/resetReason').on('value', (snapshot) => {
     console.log("⏱️ False Start reset only - continue with same runner.");
   }
 
-  // Clear the resetReason after handling
   db.ref('race/resetReason').remove();
 });
 
@@ -162,8 +161,14 @@ function finishRace() {
   airhorn.play();
 }
 
+// --- Gear Toggle Menu --- //
+settingsGear.addEventListener('click', () => {
+  const isVisible = settingsMenu.style.display === "block";
+  settingsMenu.style.display = isVisible ? "none" : "block";
+});
+
 // --- Page Load --- //
-window.onload = function() {
+window.onload = function () {
   setRandomBackground();
   authenticateAdmin();
   lapDisplay.textContent = lapCount;
@@ -173,15 +178,17 @@ window.onload = function() {
   runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
 };
 
-// --- Event Listeners --- //
+// --- Button Events --- //
 startButton.addEventListener('click', startRace);
 falseStartButton.addEventListener('click', falseStartReset);
 resetButton.addEventListener('click', resetRace);
-addLapButton.addEventListener('click', function() {
+
+addLapButton.addEventListener('click', () => {
   lapCount++;
   lapDisplay.textContent = lapCount;
 });
-subtractLapButton.addEventListener('click', function() {
+
+subtractLapButton.addEventListener('click', () => {
   if (lapCount > 0) {
     lapCount--;
     lapDisplay.textContent = lapCount;
