@@ -124,13 +124,11 @@ function resetRace() {
 // --- Page Load --- //
 window.onload = function() {
   setRandomBackground();
-  authenticateAdmin();
+  authenticateAdmin(); // ✅ moved here, after full page load
   lapDisplay.textContent = lapCount;
 
   runnerName = prompt("Enter the Runner's Name:") || 'Runner';
   runnerName = runnerName.trim().replace(/\s+/g, '_');
-
-  // Show runner name on page
   runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
 };
 
