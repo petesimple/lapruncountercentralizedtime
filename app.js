@@ -7,6 +7,7 @@ let isAdmin = false;
 let runnerName = 'Runner';
 let totalDistanceMeters = 0;
 let finalStats = '';
+let isFalseStart = false; // ✅ Track if reset is just a false start
 
 // --- Firebase Configuration --- //
 const firebaseConfig = {
@@ -97,6 +98,7 @@ function startRace() {
 // --- False Start Reset --- //
 function falseStartReset() {
   if (isAdmin) {
+    isFalseStart = true; // ✅ Mark as false start
     clearInterval(timer);
     timer = null;
     startTimestamp = null;
@@ -116,6 +118,7 @@ function falseStartReset() {
 // --- Master Reset for New Runner --- //
 function resetRace() {
   if (isAdmin) {
+    isFalseStart = false; // ✅ Mark as full reset
     db.ref('race/startTimestamp').remove().then(() => {
       clearInterval(timer);
       timer = null;
@@ -125,12 +128,6 @@ function resetRace() {
       updateTimerDisplay(raceDuration);
       lapDisplay.textContent = lapCount;
       summaryDisplay.innerHTML = '';
-
-      runnerName = prompt("Enter the next Runner's Name:") || 'Runner';
-      runnerName = runnerName.trim().replace(/\s+/g, '_');
-      runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
-
-      alert("✅ Race has been reset. Ready for next runner!");
     }).catch((error) => {
       console.error("Reset failed:", error);
     });
@@ -155,7 +152,16 @@ db.ref('race/startTimestamp').on('value', (snapshot) => {
     updateTimerDisplay(raceDuration);
     lapDisplay.textContent = 0;
     summaryDisplay.innerHTML = '';
+
     console.log("Timer reset because startTimestamp was cleared.");
+
+    if (!isFalseStart) {
+      runnerName = prompt("Enter the next Runner's Name:") || 'Runner';
+      runnerName = runnerName.trim().replace(/\s+/g, '_');
+      runnerNameDisplay.textContent = runnerName.replace(/_/g, ' ');
+      alert("✅ Race has been fully reset. Ready for next runner!");
+    }
+    isFalseStart = false; // Always reset flag after handling
   }
 });
 
