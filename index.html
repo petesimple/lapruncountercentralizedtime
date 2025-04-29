@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LP Run Lap Counter</title>
 
-  <!-- Tie-Dye Background Style -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -38,7 +37,7 @@
     button {
       cursor: pointer;
     }
-    #startButton, #resetButton {
+    #startButton, #resetButton, #falseStartButton {
       margin: 10px;
       padding: 12px 24px;
       font-size: 1.2em;
@@ -59,6 +58,8 @@
     <div id="timer">33:20</div>
 
     <button id="startButton">Start Race</button>
+    <button id="falseStartButton" style="display:none;">False Start Reset</button>
+    <button id="resetButton" style="display:none;">Master Reset</button>
 
     <div class="lap-controls">
       <h2>Laps: <span id="lapCount">0</span></h2>
@@ -68,7 +69,6 @@
 
     <div id="summary"></div>
 
-    <button id="resetButton" style="display:none;">Master Reset</button>
   </div>
 
   <audio id="airhorn" src="airhorn.mp3" preload="auto"></audio>
